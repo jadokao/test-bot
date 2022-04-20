@@ -1,3 +1,4 @@
+require('dotenv').config()
 const https = require('https')
 const express = require('express')
 const app = express()
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 app.post('/webhook', function (req, res) {
 	res.send('HTTP POST request sent to the webhook URL!')
 	// If the user sends a message to your bot, send a reply message
+    console.log(req.body.events)
 	if (req.body.events[0].type === 'message') {
 		// Message data, must be stringified
 		const dataString = JSON.stringify({
@@ -38,7 +40,7 @@ app.post('/webhook', function (req, res) {
 		// Request header
 		const headers = {
 			'Content-Type': 'application/json',
-			Authorization: 'Bearer ' + TOKEN
+			Authorization: 'Bearer ' + process.env.TOKEN
 		}
 
 		// Options to pass into the request
