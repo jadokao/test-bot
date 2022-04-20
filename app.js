@@ -1,9 +1,13 @@
 require('dotenv').config()
 const https = require('https')
 const express = require('express')
+const line = require('@line/bot-sdk')
 const app = express()
-const TOKEN = process.env.LINE_ACCESS_TOKEN
 const PORT = process.env.PORT || 3000
+
+const client = new line.Client({
+  channelAccessToken: process.env.TOKEN
+})
 
 app.use(express.json())
 
@@ -17,6 +21,23 @@ app.get('/', (req, res) => {
   res.sendStatus(200)
 })
 
+// 要傳送的訊息
+const message = {
+  type: 'text',
+  text: 'Hello World!'
+}
+
+// 傳送push message >> 主動推播給USER
+// client
+//   .pushMessage('U523b61b998fbaaaa81ac5aa83de41d11', message)
+//   .then(() => {
+//     console.log('success')
+//   })
+//   .catch((err) => {
+//     // error handling
+//     console.log('err')
+//   })
+
 app.post('/webhook', function (req, res) {
   res.send('HTTP POST request sent to the webhook URL!')
   // If the user sends a message to your bot, send a reply message
@@ -28,7 +49,6 @@ app.post('/webhook', function (req, res) {
         // 每一筆request都不一樣
         replyToken: req.body.events[0].replyToken,
         // 要傳送給USER的訊息類型及內容
-
         messages: [
           {
             type: 'text',
@@ -45,7 +65,6 @@ app.post('/webhook', function (req, res) {
         // 每一筆request都不一樣
         replyToken: req.body.events[0].replyToken,
         // 要傳送給USER的訊息類型及內容
-
         messages: [
           {
             type: 'text',
