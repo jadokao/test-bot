@@ -2,11 +2,13 @@ require('dotenv').config()
 const https = require('https')
 const express = require('express')
 const line = require('@line/bot-sdk')
+const fs = require('fs')
 const app = express()
 const PORT = process.env.PORT || 3000
 
 const client = new line.Client({
-  channelAccessToken: process.env.TOKEN
+  channelAccessToken: process.env.TOKEN,
+  channelSecret: process.env.SECRET
 })
 
 app.use(express.json())
@@ -20,6 +22,54 @@ app.use(
 app.get('/', (req, res) => {
   res.sendStatus(200)
 })
+
+// rich menu格式
+const richmenu = {
+  size: {
+    width: 2500,
+    height: 1686
+  },
+  selected: true,
+  name: 'Nice Rich Menu',
+  chatBarText: 'Tap to open',
+  areas: [
+    {
+      bounds: {
+        x: 0,
+        y: 0,
+        width: 2500,
+        height: 1686
+      },
+      action: {
+        type: 'postback',
+        data: 'action=buy&itemid=123'
+      }
+    }
+  ]
+}
+
+// 用來取得richMenuId讓之後的功能來做使用
+// let RichMenu_Id
+// client
+//   .createRichMenu(richmenu)
+//   .then((richMenuId) => {
+//     RichMenu_Id = richMenuId
+//     console.log(RichMenu_Id)
+//   })
+//   .catch((err) => console.log('Create err'))
+
+// 上傳圖片至rich menu
+// client
+//   .setRichMenuImage(
+//     process.env.RICHMENU_ID,
+//     fs.createReadStream('./capoo.jpeg')
+//   )
+//   .catch((err) => console.error(err))
+
+// 將目前的rich menu設為預設
+// client
+//   .setDefaultRichMenu(RichMenu_Id)
+//   .catch((err) => console.log('Default err \n', err))
 
 // 要傳送的訊息
 const message = {
@@ -57,6 +107,21 @@ app.post('/webhook', function (req, res) {
           {
             type: 'text',
             text: 'May I help you?'
+          }
+        ]
+      })
+    } else if (req.body.events[0].message.text === 'capoo') {
+      dataString = JSON.stringify({
+        // 每一筆request都不一樣
+        replyToken: req.body.events[0].replyToken,
+        // 要傳送給USER的訊息類型及內容
+        messages: [
+          {
+            type: 'image',
+            originalContentUrl:
+              'https://static.gnjoy.com.tw/TRO/event/20201103_capoo/img/event_rom_capoo02.png?v2020_1104',
+            previewImageUrl:
+              'https://static.gnjoy.com.tw/TRO/event/20201103_capoo/img/event_rom_capoo02.png?v2020_1104'
           }
         ]
       })
